@@ -46,17 +46,103 @@ if st.button("Run T-Test", type="primary"):
         if len(data1) < 2 or len(data2) < 2:
             st.error("Each sample needs at least 2 data points")
         else:
-            # Calculate descriptive statistics
-            st.subheader("Descriptive Statistics")
+            # Run t-test
+            t_stat, p_value = stats.ttest_ind(data1, data2, equal_var=assume_equal_var)
             
-            stats_df = pd.DataFrame({
-                'Sample 1': [len(data1), np.mean(data1), np.std(data1, ddof=1), 
-                            np.min(data1), np.max(data1)],
-                'Sample 2': [len(data2), np.mean(data2), np.std(data2, ddof=1),
-                            np.min(data2), np.max(data2)]
-            }, index=['n', 'Mean', 'Std Dev', 'Min', 'Max'])
+            # Calculate confidence interval for difference in means
+            mean_diff = np.mean(data1) - np.mean(data2)
+            se_diff = np.sqrt(np.var(data1, ddof=1)/len(data1) + np.var(data2, ddof=1)/len(data2))
             
-            st.dataframe(stats_df.style.format("{:.4f}"))
+            if assume_equal_var:
+                df = len(data1) + len(data2) - 2
+            else:
+                # Welch-Satterthwaite equation
+                v1 = np.var(data1, ddof=1) / len(data1)
+                v2 = np.var(data2, ddof=1) / len(data2)
+                df = (v1 + v2)**2 / (v1**2/(len(data1)-1) + v2**2/(len(data2)-1))
+            
+            t_crit = stats.t.ppf(1 - alpha/2, df)
+            ci_lower = mean_diff - t_crit * se_diff
+            ci_upper = mean_diff + t_crit * se_diff
+            
+            # Calculate effect size (Cohen's d)
+            pooled_std = np.sqrt(((len(data1)-1)*np.var(data1, ddof=1) + 
+                                  (len(data2)-1)*np.var(data2, ddof=1)) / (len(data1) + len(data2) - 2))
+            cohens_d = mean_diff / pooled_std
+            
+            # High-level Takeaway
+            st.subheader("Takeaway")
+            
+            if p_value < alpha:
+                st.success(f"There IS a statistically significant difference between the sample means (p = {p_value:.4f} < {alpha}).")
+                st.write(f"Sample 1 mean is {mean_diff:.4f} {'higher' if mean_diff > 0 else 'lower'} than Sample 2 mean.")
+            else:
+                st.error(f"There is NO statistically significant difference between the sample means (p = {p_value:.4f} ≥ {alpha}).")
+                st.write("This doesn't prove the means are equal, just that you don't have enough evidence to say they're different.")
+
+            # Results
+            st.subheader("T-Test Results")
+            
+            st.metric("Difference in Means (Sample 1 - Sample 2)", f"{mean_diff:.4f}")
+            st.metric(f"{int((1-alpha)*100)}% Confidence Interval", 
+                     f"[{ci_lower:.4f}, {ci_upper:.4f}]")
+            
+            col3, col4 = st.columns(2)
+            with col3:
+                st.metric("t-statistic", f"{t_stat:.4f}")
+                st.metric("Degrees of freedom", f"{df:.1f}")
+            with col4:
+                st.metric("p-value", f"{p_value:.4f}")
+            
+            # Interpretation
+            st.subheader("What Does This Mean?")
+            
+            # Simple language explanation
+            st.markdown("### In Plain English:")
+            
+            if p_value < alpha:
+                st.success("**The two groups ARE different**")
+                st.write(f"**Bottom line:** Sample 1's average ({np.mean(data1):.2f}) is statistically different from Sample 2's average ({np.mean(data2):.2f}).")
+                
+                difference_direction = "higher" if mean_diff > 0 else "lower"
+                percent_diff = (mean_diff / np.mean(data2)) * 100
+                st.write(f"Sample 1 is **{abs(mean_diff):.2f} points {difference_direction}** than Sample 2 (a **{abs(percent_diff):.1f}%** difference).")
+                
+                st.write(f"The probability this difference happened by random chance is only **{p_value*100:.2f}%** (very unlikely).")
+                
+                # Practical significance
+                if abs(cohens_d) < 0.2:
+                    st.warning("⚠️ **However**, the difference is **tiny** (effect size is negligible). Statistically significant doesn't always mean practically important.")
+                elif abs(cohens_d) < 0.5:
+                    st.info("ℹ️ The difference is **small** but real. Consider whether this size of difference matters for your situation.")
+                elif abs(cohens_d) < 0.8:
+                    st.success("✅ The difference is **medium-sized** and likely meaningful in practice.")
+                else:
+                    st.success("✅ The difference is **large** and definitely meaningful in practice.")
+                    
+            else:
+                st.error("**No significant difference detected**")
+                st.write(f"**Bottom line:** Based on this data, Sample 1's average ({np.mean(data1):.2f}) and Sample 2's average ({np.mean(data2):.2f}) are not statistically different.")
+                
+                st.write(f"The difference you see ({abs(mean_diff):.2f} points) could easily happen by random chance (probability: **{p_value*100:.1f}%**).")
+                
+                st.write("**Important:** This doesn't prove they're identical, just that you don't have enough evidence to say they're different. Maybe you need more data, or maybe they really are similar.")
+            
+            # Confidence interval explanation
+            st.markdown("### How Confident Are We?")
+            st.write(f"We're **{int((1-alpha)*100)}% confident** the true difference between the groups falls between **{ci_lower:.2f}** and **{ci_upper:.2f}**.")
+            
+            if ci_lower < 0 < ci_upper:
+                st.write("Notice the range includes zero - this suggests the groups might actually be the same.")
+            
+            # Technical details in expander
+            with st.expander("📊 Technical Details (for the stats nerds)"):
+                st.write(f"**t-statistic:** {t_stat:.4f}")
+                st.write(f"**Degrees of freedom:** {df:.1f}")
+                st.write(f"**p-value:** {p_value:.4f}")
+                st.write(f"**Cohen's d:** {cohens_d:.4f}")
+                st.write(f"**Test type:** {'Student\'s t-test (equal variances)' if assume_equal_var else 'Welch\'s t-test (unequal variances)'}")
+                st.write(f"**Significance level:** {alpha}")
             
             # Plot distributions
             st.subheader("Distribution Comparison")
@@ -78,37 +164,33 @@ if st.button("Run T-Test", type="primary"):
             ax1.grid(True, alpha=0.3)
             
             # Box plots
-            box_data = [data1, data2]
-            bp = ax2.boxplot(box_data, labels=['Sample 1', 'Sample 2'], patch_artist=True)
+             box_data = [data1, data2]
+            bp = ax2.boxplot(box_data, labels=['Sample 1', 'Sample 2'], patch_artist=True,
+                           medianprops=dict(color='black', linewidth=2))
             bp['boxes'][0].set_facecolor('#1f77b4')
+            bp['boxes'][0].set_alpha(0.6)
             bp['boxes'][1].set_facecolor('#ff7f0e')
+            bp['boxes'][1].set_alpha(0.6)
             ax2.set_ylabel('Value')
             ax2.set_title('Box Plots (showing spread and outliers)')
             ax2.grid(True, alpha=0.3, axis='y')
             
             plt.tight_layout()
             st.pyplot(fig)
+
+            # Calculate descriptive statistics
+            st.subheader("Descriptive Statistics")
             
-            # Run t-test
-            t_stat, p_value = stats.ttest_ind(data1, data2, equal_var=assume_equal_var)
+            stats_df = pd.DataFrame({
+                'Sample 1': [len(data1), np.mean(data1), np.std(data1, ddof=1), 
+                            np.min(data1), np.max(data1)],
+                'Sample 2': [len(data2), np.mean(data2), np.std(data2, ddof=1),
+                            np.min(data2), np.max(data2)]
+            }, index=['n', 'Mean', 'Std Dev', 'Min', 'Max'])
             
-            # Calculate confidence interval for difference in means
-            mean_diff = np.mean(data1) - np.mean(data2)
-            se_diff = np.sqrt(np.var(data1, ddof=1)/len(data1) + np.var(data2, ddof=1)/len(data2))
+            st.dataframe(stats_df.style.format("{:.4f}"))
             
-            if assume_equal_var:
-                df = len(data1) + len(data2) - 2
-            else:
-                # Welch-Satterthwaite equation
-                v1 = np.var(data1, ddof=1) / len(data1)
-                v2 = np.var(data2, ddof=1) / len(data2)
-                df = (v1 + v2)**2 / (v1**2/(len(data1)-1) + v2**2/(len(data2)-1))
-            
-            t_crit = stats.t.ppf(1 - alpha/2, df)
-            ci_lower = mean_diff - t_crit * se_diff
-            ci_upper = mean_diff + t_crit * se_diff
-            
-            # Results
+            # Detailed Results
             st.subheader("T-Test Results")
             
             st.metric("Difference in Means (Sample 1 - Sample 2)", f"{mean_diff:.4f}")
@@ -121,18 +203,6 @@ if st.button("Run T-Test", type="primary"):
                 st.metric("Degrees of freedom", f"{df:.1f}")
             with col4:
                 st.metric("p-value", f"{p_value:.4f}")
-            
-            # Interpretation
-            st.subheader("Interpretation")
-            
-            if p_value < alpha:
-                st.error(f"**REJECT the null hypothesis** (p = {p_value:.4f} < {alpha})")
-                st.write(f"There IS a statistically significant difference between the means at the {alpha} level.")
-                st.write(f"Sample 1 mean is {mean_diff:.4f} {'higher' if mean_diff > 0 else 'lower'} than Sample 2 mean.")
-            else:
-                st.success(f"**FAIL TO REJECT the null hypothesis** (p = {p_value:.4f} ≥ {alpha})")
-                st.write(f"There is NO statistically significant difference between the means at the {alpha} level.")
-                st.write("This doesn't prove the means are equal, just that you don't have enough evidence to say they're different.")
             
             # Effect size (Cohen's d)
             pooled_std = np.sqrt(((len(data1)-1)*np.var(data1, ddof=1) + 
