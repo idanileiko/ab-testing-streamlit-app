@@ -17,11 +17,11 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("Sample 1")
-    data1_input = st.text_area("Enter data for Sample 1:", height=200, key="data1")
+    data1_input = st.text_area("Enter data for Sample 1:", height=200, key="data1", max_chars=None)
     
 with col2:
     st.subheader("Sample 2")
-    data2_input = st.text_area("Enter data for Sample 2:", height=200, key="data2")
+    data2_input = st.text_area("Enter data for Sample 2:", height=200, key="data2", max_chars=None)
 
 alpha = st.slider("Significance level (α)", 0.01, 0.10, 0.05, 0.01)
 
