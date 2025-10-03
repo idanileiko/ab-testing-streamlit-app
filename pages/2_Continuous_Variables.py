@@ -154,7 +154,7 @@ if st.button("Run T-Test", type="primary"):
             ax1.grid(True, alpha=0.3)
             
             # Box plots
-             box_data = [data1, data2]
+            box_data = [data1, data2]
             bp = ax2.boxplot(box_data, labels=['Sample 1', 'Sample 2'], patch_artist=True,
                            medianprops=dict(color='black', linewidth=2))
             bp['boxes'][0].set_facecolor('#1f77b4')
