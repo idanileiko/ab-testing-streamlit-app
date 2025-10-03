@@ -10,18 +10,7 @@ st.set_page_config(
 
 st.sidebar.success("Select a page above.")
 
-st.markdown(
-    """
-    Welcome!
-    **Select a page from the sidebar** that fits your stats use-case!
-"""
-)
-
-st.write("Current working directory:", os.getcwd())
-st.write("Files in current directory:", os.listdir())
-
-if os.path.exists("pages"):
-    st.write("Pages folder exists!")
-    st.write("Files in pages folder:", os.listdir("pages"))
-else:
-    st.write("Pages folder NOT found")
+st.title("🧪 A/B Testing Statistical Analysis")
+st.write("Upload your experiment data and run statistical tests between groups.")
+st.write("Select a page from the sidebar that fits your stats use-case!")
+st.write("Binary variables are metrics like conversion rates, click rates, retention, etc. which only have two possible options. Continuous variables are metrics like amount spent, average frame rates, total matches played, etc.")
