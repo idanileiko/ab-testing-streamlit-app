@@ -70,16 +70,6 @@ if st.button("Run T-Test", type="primary"):
                                   (len(data2)-1)*np.var(data2, ddof=1)) / (len(data1) + len(data2) - 2))
             cohens_d = mean_diff / pooled_std
             
-            # High-level Takeaway
-            st.subheader("Takeaway")
-            
-            if p_value < alpha:
-                st.success(f"There IS a statistically significant difference between the sample means (p = {p_value:.4f} < {alpha}).")
-                st.write(f"Sample 1 mean is {mean_diff:.4f} {'higher' if mean_diff > 0 else 'lower'} than Sample 2 mean.")
-            else:
-                st.error(f"There is NO statistically significant difference between the sample means (p = {p_value:.4f} ≥ {alpha}).")
-                st.write("This doesn't prove the means are equal, just that you don't have enough evidence to say they're different.")
-
             # Results
             st.subheader("T-Test Results")
             
