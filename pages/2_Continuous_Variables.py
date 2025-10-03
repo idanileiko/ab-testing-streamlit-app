@@ -83,8 +83,8 @@ if st.button("Run T-Test", type="primary"):
             st.markdown("### Takeaways:")
             
             if p_value < alpha:
-                st.success("**The two groups ARE different**")
-                st.write(f"**Sample 1's average ({np.mean(data1):.2f}) is statistically different from Sample 2's average ({np.mean(data2):.2f}).")
+                st.success("**There IS a statistically significant difference between the two groups.**")
+                st.write(f"Sample 1's average ({np.mean(data1):.2f}) is statistically different from Sample 2's average ({np.mean(data2):.2f}).")
                 
                 difference_direction = "higher" if mean_diff > 0 else "lower"
                 percent_diff = (mean_diff / np.mean(data2)) * 100
@@ -103,7 +103,7 @@ if st.button("Run T-Test", type="primary"):
                     st.success("The difference is **large** and definitely meaningful in practice.")
                     
             else:
-                st.error("**No significant difference detected**")
+                st.error("**No significant difference detected.**")
                 st.write(f"Sample 1's average ({np.mean(data1):.2f}) and Sample 2's average ({np.mean(data2):.2f}) are not statistically different.")
                 
                 st.write(f"The difference you see ({abs(mean_diff):.2f} points) could easily happen by random chance (probability: **{p_value*100:.1f}%**).")
