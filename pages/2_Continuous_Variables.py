@@ -2,6 +2,8 @@ import streamlit as st
 import numpy as np
 from scipy import stats
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 st.set_page_config(
     page_title="A/B Testing Analysis for Continuous Variables",
