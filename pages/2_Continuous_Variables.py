@@ -28,7 +28,7 @@ assume_equal_var = st.checkbox("Assume equal variances (Student's t-test)", valu
 if not assume_equal_var:
     st.caption("Welch's t-test will be used (does not assume equal variances)")
 
-alpha = st.slider("Significance level (α)", 0.01, 0.10, 0.05, 0.01, 0.015, 0.2, value = 0.05)
+alpha = st.slider("Significance level (α)", 0.01, 0.10, 0.05, 0.01)
 
 if st.button("Run T-Test", type="primary"):
     try:
