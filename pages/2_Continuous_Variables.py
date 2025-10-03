@@ -100,13 +100,13 @@ if st.button("Run T-Test", type="primary"):
             
             # Technical details in expander
             with st.expander("📊 Technical Details (for the stats nerds)"):
-                st.write(f"**t-statistic:** {t_stat:.4f}")
-                st.write(f"**Degrees of freedom:** {df:.1f}")
                 st.write(f"**p-value:** {p_value:.4f}")
                 st.write(f"**Cohen's d:** {cohens_d:.4f} (effect size is **{effect_interpretation}**)")
+                st.write(f"**{int((1-alpha)*100)}% Confidence Interval:**", f"[{ci_lower:.4f}, {ci_upper:.4f}]")
+                st.write(f"**t-statistic:** {t_stat:.4f}")
+                st.write(f"**Degrees of freedom:** {df:.1f}")
                 st.write(f"**Test type:** Student\'s t-test")
                 st.write(f"**Significance level:** {alpha}")
-                st.write(f"{int((1-alpha)*100)}% Confidence Interval", f"[{ci_lower:.4f}, {ci_upper:.4f}]")
             
             # Plot distributions
             st.subheader("Distribution Comparison")
