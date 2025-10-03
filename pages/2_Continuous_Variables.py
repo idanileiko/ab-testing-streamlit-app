@@ -23,11 +23,6 @@ with col2:
     st.subheader("Sample 2")
     data2_input = st.text_area("Enter data for Sample 2:", height=200, key="data2")
 
-# Option for equal variance assumption
-assume_equal_var = st.checkbox("Assume equal variances (Student's t-test)", value=True)
-if not assume_equal_var:
-    st.caption("Welch's t-test will be used (does not assume equal variances)")
-
 alpha = st.slider("Significance level (α)", 0.01, 0.10, 0.05, 0.01)
 
 if st.button("Run T-Test", type="primary"):
@@ -47,20 +42,13 @@ if st.button("Run T-Test", type="primary"):
             st.error("Each sample needs at least 2 data points")
         else:
             # Run t-test
-            t_stat, p_value = stats.ttest_ind(data1, data2, equal_var=assume_equal_var)
+            t_stat, p_value = stats.ttest_ind(data1, data2, equal_var=True)
             
             # Calculate confidence interval for difference in means
             mean_diff = np.mean(data1) - np.mean(data2)
             se_diff = np.sqrt(np.var(data1, ddof=1)/len(data1) + np.var(data2, ddof=1)/len(data2))
-            
-            if assume_equal_var:
-                df = len(data1) + len(data2) - 2
-            else:
-                # Welch-Satterthwaite equation
-                v1 = np.var(data1, ddof=1) / len(data1)
-                v2 = np.var(data2, ddof=1) / len(data2)
-                df = (v1 + v2)**2 / (v1**2/(len(data1)-1) + v2**2/(len(data2)-1))
-            
+
+            df = len(data1) + len(data2) - 2
             t_crit = stats.t.ppf(1 - alpha/2, df)
             ci_lower = mean_diff - t_crit * se_diff
             ci_upper = mean_diff + t_crit * se_diff
