@@ -23,7 +23,7 @@ with col2:
     st.subheader("Sample 2")
     data2_input = st.text_area("Enter data for Sample 2:", height=200, key="data2", max_chars=None)
 
-alpha = st.slider("Significance level (α)", 0.01, 0.10, 0.05, 0.01)
+alpha = st.slider("Significance level (α)", 0.01, 0.20, 0.10, 0.01)
 
 if st.button("Run T-Test", type="primary"):
     try:
