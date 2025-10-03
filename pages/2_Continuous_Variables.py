@@ -11,7 +11,6 @@ st.set_page_config(
 
 st.title("🧪 A/B Testing Statistical Analysis for Continuous Variables")
 st.write("Paste your data below (one value per line, or comma/space separated)")
-
 col1, col2 = st.columns(2)
 
 with col1:
@@ -56,6 +55,34 @@ if st.button("Run T-Test", type="primary"):
             }, index=['n', 'Mean', 'Std Dev', 'Min', 'Max'])
             
             st.dataframe(stats_df.style.format("{:.4f}"))
+            
+            # Plot distributions
+            st.subheader("Distribution Comparison")
+            
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+            
+            # Histogram with KDE
+            ax1.hist(data1, bins=15, alpha=0.5, label='Sample 1', color='#1f77b4', edgecolor='black')
+            ax1.hist(data2, bins=15, alpha=0.5, label='Sample 2', color='#ff7f0e', edgecolor='black')
+            ax1.axvline(np.mean(data1), color='#1f77b4', linestyle='--', linewidth=2, label='Sample 1 Mean')
+            ax1.axvline(np.mean(data2), color='#ff7f0e', linestyle='--', linewidth=2, label='Sample 2 Mean')
+            ax1.set_xlabel('Value')
+            ax1.set_ylabel('Frequency')
+            ax1.set_title('Overlapping Histograms')
+            ax1.legend()
+            ax1.grid(True, alpha=0.3)
+            
+            # Box plots
+            box_data = [data1, data2]
+            bp = ax2.boxplot(box_data, labels=['Sample 1', 'Sample 2'], patch_artist=True)
+            bp['boxes'][0].set_facecolor('#1f77b4')
+            bp['boxes'][1].set_facecolor('#ff7f0e')
+            ax2.set_ylabel('Value')
+            ax2.set_title('Box Plots (showing spread and outliers)')
+            ax2.grid(True, alpha=0.3, axis='y')
+            
+            plt.tight_layout()
+            st.pyplot(fig)
             
             # Run t-test
             t_stat, p_value = stats.ttest_ind(data1, data2, equal_var=assume_equal_var)
