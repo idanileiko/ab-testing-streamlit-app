@@ -7,7 +7,6 @@ st.set_page_config(
 )
 
 st.title("🧪 A/B Testing Statistical Analysis for Binary Variables")
-st.write("Upload your experiment data and run statistical tests between groups.")
 
 # PDF Export Functions
 def create_html_report(analysis_results, metric_columns, df, group_id_column, pop_size_column, alpha, use_fdr, csv_filename):
