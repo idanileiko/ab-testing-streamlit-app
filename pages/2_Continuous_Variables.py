@@ -168,11 +168,8 @@ with st.expander("How to use this app"):
        - One number per line
        - Comma-separated: `1.2, 3.4, 5.6`
        - Space-separated: `1.2 3.4 5.6`
-    3. **Choose variance assumption:**
-       - Equal variances (Student's t-test): Use when samples have similar spread
-       - Unequal variances (Welch's t-test): Safer default, especially with different sample sizes
-    4. **Set significance level** (typically 0.05)
-    5. Click **Run T-Test**
+    3. **Set significance level** (typically 0.05)
+    4. Click **Run T-Test**
     
     **What you get:**
     - Descriptive statistics for both samples
