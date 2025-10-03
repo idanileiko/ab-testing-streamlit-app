@@ -28,7 +28,7 @@ assume_equal_var = st.checkbox("Assume equal variances (Student's t-test)", valu
 if not assume_equal_var:
     st.caption("Welch's t-test will be used (does not assume equal variances)")
 
-alpha = st.slider("Significance level (α)", 0.01, 0.10, 0.05, 0.01)
+alpha = st.slider("Significance level (α)", 0.01, 0.10, 0.05, 0.01, 0.015, 0.2, value = 0.05)
 
 if st.button("Run T-Test", type="primary"):
     try:
@@ -63,9 +63,12 @@ if st.button("Run T-Test", type="primary"):
             
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
             
-            # Histogram with KDE
-            ax1.hist(data1, bins=15, alpha=0.5, label='Sample 1', color='#1f77b4', edgecolor='black')
-            ax1.hist(data2, bins=15, alpha=0.5, label='Sample 2', color='#ff7f0e', edgecolor='black')
+            # Histogram with shared bins across both samples
+            all_data = np.concatenate([data1, data2])
+            bin_edges = np.linspace(all_data.min(), all_data.max(), 20)
+            
+            ax1.hist(data1, bins=bin_edges, alpha=0.5, label='Sample 1', color='#1f77b4', edgecolor='black')
+            ax1.hist(data2, bins=bin_edges, alpha=0.5, label='Sample 2', color='#ff7f0e', edgecolor='black')
             ax1.axvline(np.mean(data1), color='#1f77b4', linestyle='--', linewidth=2, label='Sample 1 Mean')
             ax1.axvline(np.mean(data2), color='#ff7f0e', linestyle='--', linewidth=2, label='Sample 2 Mean')
             ax1.set_xlabel('Value')
