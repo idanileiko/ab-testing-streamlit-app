@@ -136,15 +136,15 @@ def create_html_report(analysis_results, metric_columns, df, group_id_column, po
         metric = metric_data['metric']
         winner_info_html = metric_data['winner_info']
         
-        # Parse the winner and conversion rate from the HTML string
-        conversion_rate = "N/A"
+        # Parse the winner and rate from the HTML string
+        rate = "N/A"
         if 'WINNER:' in winner_info_html:
-            # Extract winner name and conversion rate from the HTML
+            # Extract winner name and rate from the HTML
             import re
             winner_match = re.search(r'WINNER: ([^<]+?) with a ([0-9.]+)% rate', winner_info_html)
             if winner_match:
                 winner = winner_match.group(1).strip()
-                conversion_rate = winner_match.group(2) + "%"
+                rate = winner_match.group(2) + "%"
                 status_class = "significant"
                 status = "Significant Winner"
             else:
@@ -160,7 +160,7 @@ def create_html_report(analysis_results, metric_columns, df, group_id_column, po
                 <tr class="{status_class}">
                     <td><strong>{metric}</strong></td>
                     <td>{winner}</td>
-                    <td>{conversion_rate}</td>
+                    <td>{rate}</td>
                     <td>{status}</td>
                 </tr>
         """
@@ -298,10 +298,10 @@ if uploaded_file is not None:
         if metric_columns:
             st.subheader("📈 Statistical Analysis Results")
             
-            # Calculate conversion rates if metrics are counts
+            # Calculate rates if metrics are counts
             analysis_df = df.copy()
             
-            # Add conversion rates for each metric
+            # Add rates for each metric
             for metric in metric_columns:
                 rate_col = f"{metric}_rate"
                 analysis_df[rate_col] = analysis_df[metric] / analysis_df[pop_size_column]
@@ -439,7 +439,7 @@ if uploaded_file is not None:
                         })
                     
                     # Sort by rate descending
-                    rates_summary.sort(key=lambda x: float(x['Conversion Rate']), reverse=True)
+                    rates_summary.sort(key=lambda x: float(x['rate']), reverse=True)
                     
                     # Update ranks and highlight winner if there is one
                     for i, item in enumerate(rates_summary):
@@ -461,7 +461,7 @@ if uploaded_file is not None:
                         
                         viz_data.append({
                             'Group': group_name,
-                            'Conversion_Rate': rate,  # Use the already calculated rate
+                            'rate': rate,  # Use the already calculated rate
                             'Count': successes,
                             'Population': population
                         })
@@ -472,9 +472,9 @@ if uploaded_file is not None:
                     fig = px.bar(
                         viz_df, 
                         x='Group', 
-                        y='Conversion_Rate',
+                        y='rate',
                         title=f'Rates by Group - {metric}',
-                        text='Conversion_Rate'
+                        text='rate'
                     )
                     
                     # Improve the chart appearance
@@ -498,7 +498,7 @@ if uploaded_file is not None:
                     )
                     
                     # Ensure y-axis has enough room for text labels above bars
-                    max_rate = viz_df['Conversion_Rate'].max()
+                    max_rate = viz_df['rate'].max()
                     fig.update_yaxes(range=[0, max_rate * 1.15])  # Add 15% padding above highest bar
                     
                     # Display the chart in a container for better width control
