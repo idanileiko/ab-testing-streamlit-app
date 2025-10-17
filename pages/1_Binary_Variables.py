@@ -124,7 +124,7 @@ def create_html_report(analysis_results, metric_columns, df, group_id_column, po
                 <tr>
                     <th>Metric</th>
                     <th>Winner</th>
-                    <th>Conversion Rate</th>
+                    <th>Rate</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -141,7 +141,7 @@ def create_html_report(analysis_results, metric_columns, df, group_id_column, po
         if 'WINNER:' in winner_info_html:
             # Extract winner name and conversion rate from the HTML
             import re
-            winner_match = re.search(r'WINNER: ([^<]+?) with ([0-9.]+)% conversion rate', winner_info_html)
+            winner_match = re.search(r'WINNER: ([^<]+?) with a ([0-9.]+)% rate', winner_info_html)
             if winner_match:
                 winner = winner_match.group(1).strip()
                 conversion_rate = winner_match.group(2) + "%"
@@ -189,7 +189,7 @@ def create_html_report(analysis_results, metric_columns, df, group_id_column, po
             {summary_df.to_html(classes='', table_id='', escape=False)}
             
             <div class="chart-container">
-                <h4>📈 Conversion Rate Visualization</h4>
+                <h4>📈 Rate Visualization</h4>
                 {chart_html}
             </div>
             
@@ -404,9 +404,9 @@ if uploaded_file is not None:
                         winner_has_significant_wins = potential_winner in significant_wins
                         
                         if winner_has_significant_wins:
-                            winner_message = f"🏆 **WINNER: {potential_winner}** with {winner_rate*100:.2f}% conversion rate"
+                            winner_message = f"🏆 **WINNER: {potential_winner}** with a {winner_rate*100:.2f}% rate"
                             st.success(winner_message)
-                            winner_html = f'<div class="winner-box">WINNER: {potential_winner} with {winner_rate*100:.2f}% conversion rate</div>'
+                            winner_html = f'<div class="winner-box">WINNER: {potential_winner} with a {winner_rate*100:.2f}% rate</div>'
                         else:
                             # Find who actually has the most significant wins
                             from collections import Counter
@@ -414,9 +414,9 @@ if uploaded_file is not None:
                             if win_counts:
                                 actual_winner = win_counts.most_common(1)[0][0]
                                 actual_winner_rate = group_rates[group_names.index(actual_winner)]
-                                winner_message = f"🏆 **WINNER: {actual_winner}** with {actual_winner_rate:.4f} ({actual_winner_rate*100:.2f}%) conversion rate"
+                                winner_message = f"🏆 **WINNER: {actual_winner}** with a {actual_winner_rate:.4f} ({actual_winner_rate*100:.2f}%) rate"
                                 st.success(winner_message)
-                                winner_html = f'<div class="winner-box">WINNER: {actual_winner} with {actual_winner_rate*100:.2f}% conversion rate</div>'
+                                winner_html = f'<div class="winner-box">WINNER: {actual_winner} with a {actual_winner_rate*100:.2f}% rate</div>'
                             else:
                                 winner_message = "📊 **NO CLEAR WINNER** - No statistically significant differences found"
                                 st.info(winner_message)
@@ -433,7 +433,7 @@ if uploaded_file is not None:
                         rates_summary.append({
                             'Rank': i + 1,
                             'Group': group_name,
-                            'Conversion Rate': f"{rate:.4f}",
+                            'Rate': f"{rate:.4f}",
                             'Successes': f"{successes:,}",
                             'Population': f"{population:,}"
                         })
@@ -473,7 +473,7 @@ if uploaded_file is not None:
                         viz_df, 
                         x='Group', 
                         y='Conversion_Rate',
-                        title=f'Conversion Rates by Group - {metric}',
+                        title=f'Rates by Group - {metric}',
                         text='Conversion_Rate'
                     )
                     
@@ -486,10 +486,10 @@ if uploaded_file is not None:
                     )
                     
                     fig.update_layout(
-                        yaxis_title="Conversion Rate",
+                        yaxis_title="Rate",
                         xaxis_title="Experiment Group",
                         title={
-                            'text': f'Conversion Rates by Group - {metric}',
+                            'text': f'Rates by Group - {metric}',
                             'x': 0.5,
                             'xanchor': 'center'
                         },
