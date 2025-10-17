@@ -438,8 +438,8 @@ if uploaded_file is not None:
                             'Population': f"{population:,}"
                         })
                     
-                    # Sort by rate descending
-                    rates_summary.sort(key=lambda x: float(x['rate']), reverse=True)
+                    # Sort by rate descending - FIX: Use capital 'Rate' to match dict key
+                    rates_summary.sort(key=lambda x: float(x['Rate']), reverse=True)
                     
                     # Update ranks and highlight winner if there is one
                     for i, item in enumerate(rates_summary):
@@ -461,7 +461,7 @@ if uploaded_file is not None:
                         
                         viz_data.append({
                             'Group': group_name,
-                            'rate': rate,  # Use the already calculated rate
+                            'Rate': rate,  # FIX: Changed from lowercase 'rate' to 'Rate'
                             'Count': successes,
                             'Population': population
                         })
@@ -472,9 +472,9 @@ if uploaded_file is not None:
                     fig = px.bar(
                         viz_df, 
                         x='Group', 
-                        y='rate',
+                        y='Rate',  # FIX: Changed from lowercase 'rate' to 'Rate'
                         title=f'Rates by Group - {metric}',
-                        text='rate'
+                        text='Rate'  # FIX: Changed from lowercase 'rate' to 'Rate'
                     )
                     
                     # Improve the chart appearance
@@ -498,7 +498,7 @@ if uploaded_file is not None:
                     )
                     
                     # Ensure y-axis has enough room for text labels above bars
-                    max_rate = viz_df['rate'].max()
+                    max_rate = viz_df['Rate'].max()  # FIX: Changed from lowercase 'rate' to 'Rate'
                     fig.update_yaxes(range=[0, max_rate * 1.15])  # Add 15% padding above highest bar
                     
                     # Display the chart in a container for better width control
